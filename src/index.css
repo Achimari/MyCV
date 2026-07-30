@@ -1,0 +1,1781 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   AKONY — дисплейная гарнитура.
+
+   Лицензионного файла в репозитории нет, поэтому объявление намеренно
+   выключено: живой @font-face с несуществующим путём давал бы 404 на каждой
+   загрузке без единого визуального выигрыша. Токены ниже уже начинаются
+   с "AKONY", так что подключение — это снять комментарий с этого блока,
+   положив файл в public/fonts/akony/ (см. README там же).
+
+   ВАЖНО: перед подключением убедитесь, что сборка AKONY содержит кириллицу.
+   Латинская версия приведёт к смешению глифов двух гарнитур в одном слове.
+
+@font-face {
+  font-family: "AKONY";
+  src: url("/fonts/akony/akony-variable.woff2") format("woff2-variations");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-007F, U+0400-04FF, U+2010-2027;
+}
+--------------------------------------------------------------------------- */
+
+@layer base {
+  :root {
+    --archive-black: #0a0a0a;
+    --archive-black-soft: #121211;
+    --archive-paper: #e7e1d5;
+    --archive-ash: #8e8b83;
+    /* Осветлённый красный: 4.66:1 на #0a0a0a — мелкий текст и чёрный текст
+       на красной плашке проходят WCAG AA. Прежний #b6382f давал 3.39:1. */
+    --archive-red: #d9483c;
+    --archive-red-deep: #b6382f;
+    --archive-cyan: #1598c2;
+    --archive-yellow: #e6d21f;
+    --archive-olive: #4b4c36;
+    --archive-line: rgba(231, 225, 213, 0.22);
+    /* Описания и подписи: 7.4:1 вместо 4.6:1 у --archive-ash.
+       Серый остаётся только для действительно третичного текста. */
+    --archive-ash-bright: #b9b4a9;
+
+    /* ---- Гарнитуры ------------------------------------------------------
+       Система из двух семейств: узкий плакатный дисплей и тёплый текстовый
+       гротеск с сильной кириллицей. AKONY стоит первым — как только файл
+       появится в public/fonts/akony/, он включится без правок разметки.
+
+       --font-display — заголовки, дни недели, названия площадок, финальный
+                        лозунг: всё, что работает как плакатная надпись.
+       --font-body    — абзацы, описания, подписи: Golos Text нарисован под
+                        кириллицу и читается там, где узкий гротеск сыпется.
+       --font-ui      — навигация, кнопки, метки. Намеренно текстовая
+                        гарнитура: дисплейная в 13px теряет различимость. */
+    --font-display: "AKONY", "Alumni Sans", "Arial Narrow", system-ui, sans-serif;
+    --font-body: "Golos Text", "Roboto Condensed", system-ui, sans-serif;
+    --font-ui: var(--font-body);
+
+    /* ---- Шкала ----------------------------------------------------------
+       Ступени различимы по назначению, а не по «чуть больше / чуть меньше».
+       Порядок по величине: CTA → секция → герой → средний дисплей → текст. */
+    --type-cta: clamp(2.6rem, 5vw, 5.4rem);
+    --type-section: clamp(2.2rem, 3.8vw, 4rem);
+    --type-hero: clamp(2.1rem, 3.2vw, 4.2rem);
+    --type-display-md: clamp(1.5rem, 2vw, 2.15rem);
+    --type-display-sm: clamp(1.15rem, 1.45vw, 1.5rem);
+    --type-body-lg: clamp(1.02rem, 1.15vw, 1.18rem);
+    --type-body: clamp(0.95rem, 1vw, 1.05rem);
+    --type-body-sm: clamp(0.88rem, 0.92vw, 0.95rem);
+    /* Нижняя граница — 13.1px: мелкие метки остаются различимыми. */
+    --type-label: clamp(0.82rem, 0.85vw, 0.9rem);
+
+    /* ---- Интерлиньяж и трекинг ----------------------------------------- */
+    --leading-display: 0.92;
+    --leading-display-tight: 0.88;
+    --leading-body: 1.55;
+    --tracking-display: -0.025em;
+    --tracking-label: 0.1em;
+
+    /* Единый словарь движения. */
+    --dur-fast: 150ms;
+    --dur-ui: 220ms;
+    --dur-reveal: 560ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ink: var(--archive-black);
+    --ink-soft: var(--archive-black-soft);
+    --bone: var(--archive-paper);
+    --ash: var(--archive-ash);
+    --burgundy: var(--archive-red);
+    --marker: var(--archive-yellow);
+    --violet: var(--archive-cyan);
+    --hairline: var(--archive-line);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    /* Убирает 300 мс задержку двойного тапа на всех управляющих элементах. */
+    touch-action: manipulation;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    /* Скролл-контейнер для Framer useScroll: из static позиции смещения
+       цели считаются неверно. */
+    position: relative;
+  }
+
+  /* Якоря не должны уезжать под фиксированную навигацию. */
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--ink);
+    color: var(--bone);
+    font-family: var(--font-body);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: var(--tracking-display);
+    line-height: var(--leading-display);
+  }
+
+  p {
+    text-wrap: pretty;
+    line-height: var(--leading-body);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--marker);
+    outline-offset: 3px;
+    border-radius: 0;
+  }
+
+  ::selection {
+    background: var(--marker);
+    color: var(--ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--burgundy);
+  }
+}
+
+@layer components {
+  /* Общая колонка страницы — совпадает по ширине с навигацией и сценой героя. */
+  .shell {
+    width: min(100% - 2rem, 94rem);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .shell {
+      width: min(100% - 3.5rem, 94rem);
+    }
+  }
+
+  .body-lead {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.6;
+    max-width: 58ch;
+    color: #cfcac0;
+  }
+
+  .rule {
+    height: 1px;
+    background: var(--hairline);
+  }
+}
+
+@layer utilities {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .text-stroke {
+    -webkit-text-stroke: 2px var(--bone);
+    color: transparent;
+  }
+
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+}
+
+.archive-skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  padding: 0.8rem 1rem;
+  background: var(--archive-yellow);
+  color: var(--archive-black);
+  font: 700 var(--type-label) / 1 var(--font-ui);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  transform: translateY(-160%);
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+
+.archive-skip-link:focus {
+  transform: translateY(0);
+}
+
+.archive-nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 40;
+  border-bottom: 1px solid var(--archive-line);
+  color: var(--archive-paper);
+  padding-top: env(safe-area-inset-top, 0px);
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    backdrop-filter var(--dur-ui) var(--ease-out);
+}
+
+.archive-nav--scrolled {
+  border-bottom: 1px solid var(--archive-line);
+  background: rgba(10, 10, 10, 0.94);
+}
+
+.archive-nav__inner {
+  width: min(calc(100% - 2rem), 94rem);
+  height: 4.75rem;
+  margin-inline: auto;
+  padding-inline: max(0px, env(safe-area-inset-left, 0px)) max(0px, env(safe-area-inset-right, 0px));
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) auto minmax(13rem, 1fr);
+  align-items: center;
+}
+
+.archive-nav--scrolled .archive-nav__inner {
+  border-color: transparent;
+}
+
+.archive-nav__brand,
+.archive-nav__signal,
+.archive-nav__links a {
+  font: 700 var(--type-label) / 1 var(--font-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.archive-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  min-height: 44px;
+  width: max-content;
+}
+
+.archive-nav__links {
+  display: flex;
+  align-self: stretch;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.archive-nav__links a {
+  position: relative;
+  display: grid;
+  height: 100%;
+  min-width: 7.5rem;
+  place-items: center;
+  color: var(--archive-ash);
+  transition: color var(--dur-ui) var(--ease-out);
+}
+
+.archive-nav__links a::after {
+  content: "";
+  position: absolute;
+  inset: auto 1rem 0;
+  height: 3px;
+  background: var(--archive-red-deep);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+
+.archive-nav__links a:hover,
+.archive-nav__links a:focus-visible,
+.archive-nav__links a[aria-current="true"] {
+  color: var(--archive-paper);
+}
+
+.archive-nav__links a[aria-current="true"]::after {
+  transform: scaleX(1);
+}
+
+.archive-nav__signal {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  border: 1px solid var(--archive-line);
+  padding-inline: 1rem;
+  transition:
+    color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    background-color var(--dur-ui) var(--ease-out);
+}
+
+.archive-nav__signal:active {
+  transform: translateY(1px);
+}
+
+.archive-nav__signal svg {
+  width: 0.9rem;
+  color: var(--archive-red);
+}
+
+.archive-nav__signal:hover,
+.archive-nav__signal:focus-visible {
+  border-color: var(--archive-paper);
+  background: var(--archive-paper);
+  color: var(--archive-black);
+}
+
+.archive-nav__menu {
+  display: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--archive-line);
+  background: transparent;
+  color: var(--archive-paper);
+}
+
+.archive-nav__menu svg {
+  width: 1.2rem;
+}
+
+.archive-mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  padding:
+    calc(6.5rem + env(safe-area-inset-top, 0px)) 1.25rem
+    calc(2rem + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 255, 255, 0.025) 3px,
+      rgba(255, 255, 255, 0.025) 4px
+    ),
+    var(--archive-black);
+}
+
+.archive-mobile-menu > p {
+  margin: 0;
+  color: var(--archive-ash);
+  font-size: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.archive-mobile-menu ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--archive-line);
+}
+
+.archive-mobile-menu li {
+  border-bottom: 1px solid var(--archive-line);
+}
+
+.archive-mobile-menu li a {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 1rem;
+  font: 900 clamp(2.4rem, 12vw, 4.2rem) / 0.92 var(--font-display);
+  text-transform: uppercase;
+}
+
+.archive-mobile-menu li span {
+  color: var(--archive-red);
+  font: 700 var(--type-label) / 1 var(--font-ui);
+}
+
+.archive-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  font: 700 var(--type-label) / 1.1 var(--font-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.archive-action svg {
+  width: 1.1rem;
+  flex: none;
+  transition: transform 180ms ease;
+}
+
+.archive-action:hover svg,
+.archive-action:focus-visible svg {
+  transform: translate(0.16rem, -0.16rem);
+}
+
+.archive-action--primary {
+  min-width: min(100%, 18rem);
+  background: var(--archive-red);
+  color: var(--archive-black);
+}
+
+.archive-action--primary:hover,
+.archive-action--primary:focus-visible {
+  background: var(--archive-paper);
+}
+
+.archive-action--secondary {
+  border-bottom-color: var(--archive-line);
+  color: var(--archive-paper);
+}
+
+.archive-action--secondary:hover,
+.archive-action--secondary:focus-visible {
+  border-color: var(--archive-paper);
+}
+
+/* Контурная кнопка на полной рамке — используется в панелях приборной доски. */
+.archive-action--ghost {
+  border-color: var(--archive-line);
+  color: var(--archive-paper);
+}
+
+.archive-action--ghost:hover,
+.archive-action--ghost:focus-visible {
+  border-color: var(--archive-paper);
+  background: var(--archive-paper);
+  color: var(--archive-black);
+}
+
+.archive-action--signal {
+  border-color: rgba(21, 152, 194, 0.55);
+  color: var(--archive-cyan);
+}
+
+.archive-action--signal:hover,
+.archive-action--signal:focus-visible {
+  border-color: var(--archive-cyan);
+  background: var(--archive-cyan);
+  color: var(--archive-black);
+}
+
+.archive-action--block {
+  display: flex;
+  width: 100%;
+}
+
+@keyframes archive-watermark-run {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.about-opening {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: 4.75rem;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    var(--archive-black);
+  background-size:
+    5rem 5rem,
+    auto;
+}
+
+.about-opening__scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.08;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(21, 152, 194, 0.18) 3px,
+    rgba(21, 152, 194, 0.18) 4px
+  );
+  mask-image: radial-gradient(circle at 72% 40%, #000 12%, transparent 58%);
+}
+
+.about-opening__watermarks {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: max(220vw, 220vh);
+  height: max(220vw, 220vh);
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  transform-origin: center;
+}
+
+/* Каждая строка пересекает всё повёрнутое поле, включая его дальние углы. */
+.about-opening__watermark-row {
+  flex: 0 0 auto;
+  width: 100%;
+  overflow: hidden;
+  opacity: 0.42;
+}
+
+.about-opening__watermark-row:nth-child(even) {
+  opacity: 0.28;
+}
+
+/* Две одинаковые группы занимают ровно по половине трека. Поэтому переход
+   -50% → 0 всегда подменяет одну полную строку другой без пустого кадра. */
+.about-opening__watermark-track {
+  display: flex;
+  width: 200%;
+  backface-visibility: hidden;
+  will-change: transform;
+  animation: archive-watermark-run 28s linear infinite;
+}
+
+.about-opening__watermark-row:nth-child(3n) .about-opening__watermark-track {
+  animation-duration: 35s;
+}
+
+.about-opening__watermark-group {
+  display: flex;
+  flex: none;
+  width: 50%;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-around;
+  gap: clamp(2.25rem, 5vw, 6rem);
+  padding-inline: clamp(1.5rem, 3vw, 4rem);
+}
+
+.about-opening__watermark-item {
+  display: block;
+  flex: none;
+  color: rgba(231, 225, 213, 0.075);
+  font: 900 clamp(3.8rem, 6vw, 6.8rem) / 0.8 var(--font-display);
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+}
+
+.about-opening__shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Опорная композиция: ~30% текста слева, ~70% портрета справа. */
+.about-opening__grid {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.43fr) minmax(0, 1fr);
+  grid-template-areas: "manifesto portrait";
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3.5rem);
+  min-height: calc(max(720px, 100svh) - 4.75rem);
+}
+
+.about-opening__manifesto {
+  grid-area: manifesto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(2rem, 3vw, 3.5rem);
+  padding-inline: 0;
+}
+
+/* Две строки задаёт <br> в разметке, поэтому мера здесь — только страховка:
+   она достаточно широка, чтобы «БЕТОННЫХ ОКРАИН.» никогда не разрывалось,
+   и достаточно узка, чтобы заголовок не подходил к портрету вплотную. */
+.about-opening__manifesto h1 {
+  max-width: 11em;
+  margin: 0 0 clamp(1rem, 1.8vh, 1.5rem);
+  color: var(--archive-paper);
+  font: 900 var(--type-hero) / 0.94 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: pretty;
+}
+
+.about-opening__manifesto > p:last-child {
+  max-width: 42ch;
+  margin: 0;
+  /* 10.1:1 на #0a0a0a — подпись читается, но не спорит с портретом. */
+  color: #cfcac0;
+  font-size: var(--type-body-lg);
+  line-height: 1.55;
+}
+
+/* Портрет вписывается целиком: кадрировать нечего, поэтому нет ни overflow,
+   ни абсолютных смещений, которые ломаются на другой ширине. */
+.about-opening__portrait-frame {
+  grid-area: portrait;
+  position: relative;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* Слой выведен из потока, поэтому картинка не может распереть строку сетки
+   собственной пропорцией — высоту задаёт герой, а contain вписывает портрет
+   в неё целиком. Вертикальные отступы — воздух над головой и под шеей. */
+.about-opening__portrait-drift {
+  position: absolute;
+  inset: clamp(0.75rem, 4%, 3rem) 0;
+}
+
+.about-opening__portrait-shift {
+  width: 100%;
+  height: 100%;
+}
+
+.about-opening__portrait-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  /* Очки в исходнике на 54.7% × 43.2% кадра — сдвиг подводит их к
+     оптическому центру героя, не срезая ни макушку, ни бока. */
+  object-position: 52% center;
+  animation: achimari-portrait-float 9s ease-in-out infinite;
+}
+
+@keyframes achimari-portrait-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+.dashboard-shell {
+  width: min(calc(100% - 2rem), 94rem);
+  margin-inline: auto;
+}
+
+.dashboard-section {
+  position: relative;
+  overflow: hidden;
+  /* Ритм страницы: расстояние между разделами, а не пустая полоса. */
+  padding-block: clamp(3.5rem, 5vw, 5rem);
+  border-top: 1px solid var(--archive-line);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+    var(--archive-black);
+  background-size:
+    5rem 5rem,
+    auto;
+}
+
+.dashboard-label {
+  margin: 0;
+  color: var(--archive-red);
+  font: 700 var(--type-label) / 1 var(--font-ui);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.dashboard-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.42fr);
+  align-items: end;
+  gap: clamp(1rem, 2.5vw, 2.5rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--archive-line);
+}
+
+.dashboard-heading__meta {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  /* Метка объясняет заголовок — она стоит рядом с ним, а не в отдельной полосе. */
+  margin: 0 0 clamp(0.85rem, 1.4vw, 1.15rem);
+  color: var(--archive-red);
+  font-size: var(--type-label);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.dashboard-heading__index {
+  font-variant-numeric: tabular-nums;
+  color: var(--archive-ash);
+}
+
+/* Мера в em, а не в ch: у узкой дисплейной гарнитуры цифра почти вдвое уже
+   прописной кириллицы, поэтому 17ch давали строку на 6 слов и одинокое
+   слово в конце. 13em держат заголовок в двух сбалансированных строках. */
+.dashboard-heading h2 {
+  max-width: 13em;
+  margin: 0;
+  color: var(--archive-paper);
+  font: 900 var(--type-section) / var(--leading-display-tight) var(--font-display);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.dashboard-heading__description {
+  margin: 0;
+  padding-bottom: 0.4rem;
+  color: var(--archive-ash-bright);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+/* Заголовок → содержимое: один шаг ритма для всех разделов. */
+.broadcast-grid,
+.schedule-layout,
+.channel-list {
+  margin-top: clamp(2rem, 3vw, 3.25rem);
+}
+
+.broadcast-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(26rem, 1fr);
+  gap: 1px;
+  padding: 1px;
+  background: var(--archive-line);
+}
+
+.broadcast-monitor {
+  position: relative;
+  min-height: 21rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(21, 152, 194, 0.16), transparent 45%),
+    var(--archive-black-soft);
+  color: var(--archive-paper);
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out);
+}
+
+.broadcast-monitor:active {
+  transform: translateY(1px);
+}
+
+.broadcast-monitor::after {
+  content: "TWITCH";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  color: rgba(231, 225, 213, 0.035);
+  font: 900 clamp(6rem, 12vw, 12rem) / 0.8 var(--font-display);
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
+.broadcast-monitor__scan {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.25;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(21, 152, 194, 0.16) 3px,
+    rgba(21, 152, 194, 0.16) 4px
+  );
+}
+
+.broadcast-monitor > *:not(.broadcast-monitor__scan) {
+  position: relative;
+  z-index: 2;
+}
+
+.broadcast-monitor > strong {
+  align-self: center;
+  margin-block: clamp(1.25rem, 2.5vw, 2.25rem);
+  font: 900 clamp(2.6rem, 4vw, 4.4rem) / var(--leading-display-tight) var(--font-display);
+  letter-spacing: -0.05em;
+  text-align: center;
+}
+
+.broadcast-monitor__status {
+  width: max-content;
+  max-width: 80%;
+  padding-top: 0.7rem;
+  border-top: 2px solid var(--archive-red);
+  color: var(--archive-ash-bright);
+  font-size: var(--type-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.broadcast-monitor > svg {
+  position: absolute !important;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+
+.broadcast-monitor:hover,
+.broadcast-monitor:focus-visible {
+  background: var(--archive-cyan);
+  color: var(--archive-black);
+}
+
+.broadcast-monitor:hover .broadcast-monitor__status,
+.broadcast-monitor:focus-visible .broadcast-monitor__status,
+.broadcast-monitor:hover .dashboard-label,
+.broadcast-monitor:focus-visible .dashboard-label {
+  color: var(--archive-black);
+  border-color: var(--archive-black);
+}
+
+.broadcast-monitor:hover > svg,
+.broadcast-monitor:focus-visible > svg {
+  transform: translate(0.25rem, -0.25rem);
+}
+
+.broadcast-capabilities {
+  background: var(--archive-black);
+}
+
+.broadcast-capabilities__title {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--archive-line);
+  color: var(--archive-ash);
+  font-size: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.broadcast-capabilities ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.broadcast-capabilities li {
+  display: grid;
+  grid-template-columns: 3rem minmax(8rem, 0.65fr) 1fr;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--archive-line);
+}
+
+.broadcast-capabilities li:last-child {
+  border-bottom: 0;
+}
+
+.broadcast-capabilities li > span {
+  color: var(--archive-red);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.broadcast-capabilities h3 {
+  margin: 0;
+  color: var(--archive-paper);
+  font: 800 var(--type-display-sm) / 1 var(--font-display);
+  text-transform: uppercase;
+}
+
+.broadcast-capabilities p {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--archive-ash-bright);
+  font-size: var(--type-body-sm);
+  line-height: var(--leading-body);
+}
+
+.dashboard-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.dashboard-button {
+  display: inline-flex;
+  min-width: 14rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border: 1px solid transparent;
+  font: 700 var(--type-label) / 1 var(--font-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.dashboard-button:active {
+  transform: translateY(1px);
+}
+
+.dashboard-button--md {
+  min-height: 48px;
+  padding: 0.8rem 1rem;
+}
+
+.dashboard-button--lg {
+  min-height: 56px;
+  padding: 1rem 1.2rem;
+}
+
+.dashboard-button > svg {
+  width: 1.1rem;
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+
+.dashboard-button:hover > svg,
+.dashboard-button:focus-visible > svg {
+  transform: translate(0.2rem, -0.2rem);
+}
+
+.dashboard-button--primary {
+  background: var(--archive-red);
+  color: var(--archive-black);
+}
+
+.dashboard-button--primary:hover,
+.dashboard-button--primary:focus-visible {
+  background: var(--archive-paper);
+}
+
+.dashboard-button--outline {
+  border-color: var(--archive-line);
+  color: var(--archive-paper);
+}
+
+.dashboard-button--outline:hover,
+.dashboard-button--outline:focus-visible {
+  border-color: var(--archive-paper);
+  background: var(--archive-paper);
+  color: var(--archive-black);
+}
+
+.dashboard-button__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Таблица и действия — одна горизонтальная система, без панели-заполнителя. */
+.schedule-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.26fr);
+  align-items: start;
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
+}
+
+.schedule-layout__actions {
+  flex-direction: column;
+  margin-top: 0;
+}
+
+.schedule-layout__actions .dashboard-button {
+  width: 100%;
+}
+
+.schedule-table {
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--archive-line);
+  background: var(--archive-black);
+}
+
+.schedule-table__row {
+  display: grid;
+  grid-template-columns: 4rem minmax(9rem, 0.3fr) minmax(12rem, 1fr);
+  align-items: center;
+  min-height: 6.75rem;
+  border-bottom: 1px solid var(--archive-line);
+}
+
+.schedule-table__row > * {
+  padding-inline: 1.25rem;
+}
+
+.schedule-table__row > * + * {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--archive-line);
+}
+
+.schedule-table__no {
+  color: var(--archive-red);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.schedule-table__row strong {
+  color: var(--archive-paper);
+  font: 900 var(--type-display-md) / 1 var(--font-display);
+  text-transform: uppercase;
+}
+
+/* Двухступенчатая подпись вместо мелкой серой строки: основная фраза
+   кремовым, уточнение — красным. Обе ступени дисплейные и читаемые. */
+.schedule-table__note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.15rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.schedule-table__note-main {
+  color: var(--archive-paper);
+  font-size: clamp(1.5rem, 2vw, 2.15rem);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: -0.015em;
+}
+
+.schedule-table__note-qualifier {
+  color: var(--archive-red);
+  font-size: clamp(1rem, 1.25vw, 1.3rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.015em;
+}
+
+.channel-list {
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--archive-line);
+}
+
+.channel-row {
+  border-bottom: 1px solid var(--archive-line);
+}
+
+.channel-row a {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4rem minmax(9rem, 0.7fr) minmax(13rem, 1.1fr) minmax(10rem, 0.6fr) 4rem;
+  align-items: center;
+  min-height: 4.75rem;
+  overflow: hidden;
+  color: var(--archive-paper);
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.channel-row a:active {
+  transform: translateX(3px);
+}
+
+.channel-row a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--archive-red);
+  transform: translateX(-101%);
+  transition: transform 280ms var(--ease-out);
+}
+
+.channel-row a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-top: 3px solid var(--archive-cyan);
+  opacity: 0;
+  transition: opacity var(--dur-ui) var(--ease-out);
+}
+
+.channel-row a:hover::before,
+.channel-row a:focus-visible::before {
+  transform: translateX(0);
+}
+
+.channel-row a:hover::after,
+.channel-row a:focus-visible::after {
+  opacity: 0.7;
+}
+
+.channel-row a > * {
+  position: relative;
+  z-index: 1;
+  padding-inline: 1rem;
+}
+
+.channel-row a > * + * {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--archive-line);
+}
+
+.channel-row__index {
+  color: var(--archive-red);
+  font-size: var(--type-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.channel-row__name {
+  font: 900 var(--type-display-md) / 0.94 var(--font-display);
+  text-transform: uppercase;
+}
+
+.channel-row__description,
+.channel-row__handle {
+  color: var(--archive-ash-bright);
+  font-size: var(--type-body-sm);
+}
+
+.channel-row__arrow {
+  justify-content: center;
+}
+
+.channel-row__arrow svg {
+  width: 1.2rem;
+}
+
+.channel-row a:hover,
+.channel-row a:focus-visible,
+.channel-row a:hover .channel-row__index,
+.channel-row a:focus-visible .channel-row__index,
+.channel-row a:hover .channel-row__description,
+.channel-row a:focus-visible .channel-row__description,
+.channel-row a:hover .channel-row__handle,
+.channel-row a:focus-visible .channel-row__handle {
+  color: var(--archive-black);
+}
+
+/* Высоту задаёт содержимое: панель закрывает страницу, а не заполняет экран. */
+.community-cta__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.32fr);
+  align-items: end;
+  gap: clamp(2rem, 4vw, 4rem);
+  overflow: hidden;
+  padding: clamp(2rem, 3.5vw, 3.5rem);
+  background: var(--archive-red);
+  color: var(--archive-black);
+}
+
+.community-cta__copy {
+  position: relative;
+  z-index: 1;
+}
+
+.community-cta__copy h2 {
+  max-width: 16ch;
+  margin: 0;
+  color: var(--archive-black);
+  font: 900 var(--type-cta) / var(--leading-display-tight) var(--font-display);
+  letter-spacing: -0.055em;
+}
+
+.community-cta__copy > span {
+  display: block;
+  max-width: 40ch;
+  margin-top: 1.15rem;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.community-cta__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.community-cta .dashboard-button--primary {
+  background: var(--archive-black);
+  color: var(--archive-paper);
+}
+
+.community-cta .dashboard-button--primary:hover,
+.community-cta .dashboard-button--primary:focus-visible {
+  background: var(--archive-paper);
+  color: var(--archive-black);
+}
+
+.community-cta .dashboard-button--outline {
+  border-color: rgba(10, 10, 10, 0.4);
+  color: var(--archive-black);
+}
+
+.community-cta .dashboard-button--outline:hover,
+.community-cta .dashboard-button--outline:focus-visible {
+  border-color: var(--archive-black);
+  background: var(--archive-black);
+  color: var(--archive-paper);
+}
+
+.dashboard-footer {
+  padding-block: 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--archive-line);
+  background: var(--archive-black);
+}
+
+.dashboard-footer__row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+}
+
+.dashboard-footer__row > strong {
+  color: var(--archive-paper);
+  font: 900 var(--type-display-sm) / 1 var(--font-display);
+  white-space: nowrap;
+}
+
+.dashboard-footer button {
+  min-width: 7rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--archive-line);
+  background: transparent;
+  color: var(--archive-paper);
+  padding-inline: 1rem;
+  font: 700 var(--type-label) / 1 var(--font-ui);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  transition:
+    background-color var(--dur-ui) var(--ease-out),
+    color var(--dur-ui) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.dashboard-footer button:active {
+  transform: translateY(1px);
+}
+
+.dashboard-footer button:hover,
+.dashboard-footer button:focus-visible {
+  background: var(--archive-paper);
+  color: var(--archive-black);
+}
+
+.dashboard-footer button svg {
+  width: 1rem;
+}
+
+.dashboard-footer nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-footer nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  justify-content: center;
+  color: var(--archive-ash);
+  font-size: var(--type-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color var(--dur-ui) var(--ease-out);
+}
+
+.dashboard-footer nav a:hover,
+.dashboard-footer nav a:focus-visible {
+  color: var(--archive-paper);
+}
+
+@media (max-width: 1080px) {
+  .archive-nav__inner {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .archive-nav__links {
+    display: none;
+  }
+
+  .archive-nav__menu {
+    display: inline-flex;
+    margin-left: 0.65rem;
+  }
+
+  /* Планшет: портрет остаётся доминантой, заголовок не дробится. */
+  .about-opening__grid {
+    grid-template-columns: minmax(14rem, 0.5fr) minmax(0, 1fr);
+    gap: clamp(1rem, 2vw, 2rem);
+  }
+
+  .about-opening__manifesto {
+    padding-block: clamp(1.75rem, 3vw, 3rem);
+    padding-inline: 0;
+  }
+
+  .about-opening__manifesto h1 {
+    font-size: clamp(1.8rem, 3.1vw, 2.6rem);
+  }
+
+  .about-opening__portrait-image {
+    object-position: 50% center;
+  }
+
+  .dashboard-heading {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .dashboard-heading__description {
+    max-width: 62ch;
+    padding-bottom: 0;
+  }
+
+  .broadcast-grid,
+  .schedule-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-layout__actions {
+    flex-direction: row;
+    margin-top: 1.25rem;
+  }
+
+  .schedule-layout__actions .dashboard-button {
+    width: auto;
+  }
+
+  .broadcast-monitor {
+    min-height: 19rem;
+  }
+
+  /* Ник переезжает на вторую строку вместе с описанием, а не пропадает. */
+  .channel-row a {
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto 3.5rem;
+    grid-template-areas:
+      "index name        name   arrow"
+      "index description handle arrow";
+    align-items: center;
+    min-height: 5rem;
+  }
+
+  .channel-row a > * {
+    padding-block: 0.35rem;
+  }
+
+  .channel-row a > * + * {
+    height: auto;
+    border-left: 0;
+  }
+
+  .channel-row__index {
+    grid-area: index;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--archive-line);
+  }
+
+  .channel-row__name {
+    grid-area: name;
+    padding-top: 0.6rem;
+  }
+
+  .channel-row__description {
+    grid-area: description;
+    min-width: 0;
+    padding-bottom: 0.6rem;
+  }
+
+  .channel-row__handle {
+    grid-area: handle;
+    justify-content: flex-end;
+    padding-bottom: 0.6rem;
+    text-align: right;
+  }
+
+  .channel-row__arrow {
+    grid-area: arrow;
+    align-self: stretch;
+    border-left: 1px solid var(--archive-line);
+  }
+
+  .community-cta__panel {
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.4fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .archive-nav__inner {
+    width: min(calc(100% - 1.5rem), 94rem);
+    height: 4rem;
+  }
+
+  /* Основное действие остаётся в навигации: иконка с доступным именем. */
+  .archive-nav__signal {
+    width: 44px;
+    padding-inline: 0;
+    margin-left: auto;
+  }
+
+  .archive-nav__signal-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .archive-nav__signal svg {
+    width: 1.05rem;
+  }
+
+  section[id] {
+    scroll-margin-top: 4.75rem;
+  }
+
+  .about-opening {
+    padding-top: 4rem;
+    background-size:
+      3rem 3rem,
+      auto;
+  }
+
+  .about-opening__watermark-item {
+    font-size: clamp(3.5rem, 16vw, 5.75rem);
+  }
+
+  .about-opening__watermarks {
+    width: max(260vw, 260vh);
+    height: max(260vw, 260vh);
+  }
+
+  /* Одна композиция на первый экран: портрет сверху, манифест под ним. */
+  /* Портрет получает свою полосу, текст — остаток; пустых полос между ними нет. */
+  .about-opening__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: clamp(17rem, 45vh, 24rem) minmax(0, 1fr);
+    grid-template-areas:
+      "portrait"
+      "manifesto";
+    align-items: stretch;
+    gap: 0;
+    min-height: calc(100svh - 4rem);
+  }
+
+  .about-opening__manifesto {
+    justify-content: center;
+    padding: 0 0 1.75rem;
+  }
+
+  .about-opening__manifesto h1 {
+    margin: 0 0 0.85rem;
+    font-size: clamp(1.85rem, 8.2vw, 2.7rem);
+    line-height: 0.96;
+  }
+
+  .about-opening__manifesto > p:last-child {
+    max-width: 40ch;
+    font-size: 0.98rem;
+  }
+
+  /* Лицо целиком, без обрезки по бокам: contain вписывает портрет в полосу. */
+  .about-opening__portrait-frame {
+    height: auto;
+  }
+
+  .about-opening__portrait-drift {
+    inset: 0.5rem 0 0;
+  }
+
+  .about-opening__portrait-image {
+    object-position: center;
+  }
+
+  .dashboard-shell {
+    width: calc(100% - 1.5rem);
+  }
+
+  .dashboard-section {
+    padding-block: 3.25rem;
+    background-size: 3rem 3rem;
+  }
+
+  .dashboard-heading {
+    padding-top: 0.9rem;
+    gap: 0.9rem;
+  }
+
+  .dashboard-heading__meta {
+    margin-bottom: 0.8rem;
+  }
+
+  .dashboard-heading h2 {
+    max-width: 100%;
+    font-size: clamp(2rem, 8.6vw, 3rem);
+  }
+
+  .broadcast-grid,
+  .schedule-layout,
+  .channel-list {
+    margin-top: 1.75rem;
+  }
+
+  .schedule-layout__actions {
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+
+  .schedule-layout__actions .dashboard-button {
+    width: 100%;
+  }
+
+  .broadcast-monitor {
+    min-height: 16rem;
+    padding: 1.25rem;
+  }
+
+  .broadcast-monitor > strong {
+    margin-block: 1rem;
+    font-size: clamp(3.4rem, 18vw, 5.5rem);
+  }
+
+  .broadcast-monitor > svg {
+    right: 1.25rem;
+    bottom: 1.25rem;
+  }
+
+  .broadcast-capabilities li {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.5rem 0.8rem;
+    padding: 1rem;
+  }
+
+  .broadcast-capabilities p {
+    grid-column: 2;
+  }
+
+  .dashboard-action-row {
+    flex-direction: column;
+  }
+
+  .dashboard-button {
+    width: 100%;
+  }
+
+  /* День и статус на одной строке — вторая строка появляется только при переносе. */
+  .schedule-table__row {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "number day"
+      "number status";
+    min-height: 6.5rem;
+  }
+
+  .schedule-table__note-main {
+    font-size: 1.35rem;
+  }
+
+  .schedule-table__note-qualifier {
+    font-size: 1rem;
+  }
+
+  .schedule-table__row > * {
+    padding-inline: 0.85rem;
+  }
+
+  .schedule-table__no {
+    grid-area: number;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--archive-line);
+  }
+
+  .schedule-table__row strong {
+    grid-area: day;
+    height: auto;
+    padding-top: 0.65rem;
+    border-left: 0;
+  }
+
+  .schedule-table__note {
+    grid-area: status;
+    height: auto;
+    padding-bottom: 0.65rem;
+    border-left: 0;
+  }
+
+  /* Единая высота строки: описание может переноситься, ритм списка — нет. */
+  .channel-row a {
+    grid-template-columns: 3rem minmax(0, 1fr) auto 3rem;
+    min-height: 5.75rem;
+  }
+
+  .channel-row__name {
+    font-size: clamp(1.85rem, 9vw, 2.6rem);
+  }
+
+  .channel-row__description,
+  .channel-row__handle {
+    font-size: var(--type-label);
+  }
+
+  .community-cta__panel {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 1.75rem 1rem;
+  }
+
+  .community-cta__copy h2 {
+    max-width: 100%;
+    font-size: clamp(1.95rem, 9vw, 2.9rem);
+  }
+
+  .community-cta__actions {
+    align-self: stretch;
+  }
+
+  .dashboard-footer__row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .dashboard-footer nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .dashboard-footer nav ul {
+    justify-content: flex-start;
+  }
+
+  .dashboard-footer button {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 420px) {
+  .archive-nav__brand b {
+    font-size: 0.62rem;
+  }
+
+  /* На самых узких экранах описание и ник делят строку — уменьшаем перенос. */
+  .channel-row a > * {
+    padding-inline: 0.7rem;
+  }
+
+  .channel-row__description,
+  .channel-row__handle {
+    font-size: var(--type-label);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* Петли и сдвиги убираются, содержимое остаётся видимым. */
+  .about-opening__watermark-track {
+    animation: none;
+    transform: translateX(-25%);
+  }
+
+  .about-opening__portrait-image {
+    animation: none;
+    transform: none;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .channel-row a:active,
+  .dashboard-button:active,
+  .dashboard-footer button:active,
+  .broadcast-monitor:active,
+  .archive-nav__signal:active {
+    transform: none;
+  }
+}
+
+/* Страховка: печать и экспорт в PDF не запускают IntersectionObserver. */
+@media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

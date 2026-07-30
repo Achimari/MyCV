@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0A0A" />
+
+    <title>ACHIMARI – игры, музыка, вера и честные разговоры</title>
+    <meta
+      name="description"
+      content="Стример из бетонных окраин цифровой эпохи: игры, музыка, поэзия, вера, чёрный юмор и честные разговоры."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="ACHIMARI" />
+    <meta property="og:title" content="ACHIMARI – игры, музыка, вера и честные разговоры" />
+    <meta
+      property="og:description"
+      content="Стример из бетонных окраин цифровой эпохи: игры, музыка, поэзия, вера, чёрный юмор и честные разговоры."
+    />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Сине-жёлтый портрет ACHIMARI в круглых очках" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ACHIMARI – игры, музыка, вера и честные разговоры" />
+    <meta
+      name="twitter:description"
+      content="Стример из бетонных окраин цифровой эпохи: игры, музыка, поэзия, вера, чёрный юмор и честные разговоры."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap&subset=cyrillic"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap&subset=cyrillic"
+    />
+
+    <style>
+      html {
+        background: #0a0a0a;
+        color-scheme: dark;
+      }
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: #0a0a0a;
+        color: #e7e1d5;
+        font-family: system-ui, -apple-system, sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      #boot b {
+        font-size: clamp(2.5rem, 12vw, 5rem);
+        letter-spacing: -0.03em;
+        font-weight: 800;
+        line-height: 1;
+      }
+      #boot span {
+        font-size: 0.75rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #a7a7a7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="boot">
+        <b>ACHIMARI</b>
+        <span>Загружаем стрим…</span>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
