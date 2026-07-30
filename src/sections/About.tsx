@@ -102,7 +102,7 @@ export function About() {
               <br />
               БЕТОННЫХ ОКРАИН.
             </h1>
-            <p>Игры, музыка, вера и честные разговоры. Остальное – в эфире.</p>
+            <p>Игры, музыка, вера и честные разговоры.</p>
           </div>
 
           <div className="about-opening__portrait-frame">

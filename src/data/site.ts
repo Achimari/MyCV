@@ -96,7 +96,7 @@ export const capabilities: CapabilityEntry[] = [
   },
   {
     code: "A05",
-    title: "Дистанция",
+    title: "Спорт",
     description: "За плечами 21 километр. Впереди – ещё неизвестно сколько кругов.",
   },
 ];

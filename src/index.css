@@ -83,6 +83,9 @@
     --dur-ui: 220ms;
     --dur-reveal: 560ms;
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    /* Живой внешний отступ страницы: на планшетах он заметно шире прежних
+       16px, а на больших экранах мягко растёт, пока колонка не достигнет 94rem. */
+    --page-gutter: clamp(1.25rem, 3vw, 3rem);
     --ink: var(--archive-black);
     --ink-soft: var(--archive-black-soft);
     --bone: var(--archive-paper);
@@ -253,7 +256,7 @@
 }
 
 .archive-nav__inner {
-  width: min(calc(100% - 2rem), 94rem);
+  width: min(calc(100% - var(--page-gutter) - var(--page-gutter)), 94rem);
   height: 4.75rem;
   margin-inline: auto;
   padding-inline: max(0px, env(safe-area-inset-left, 0px)) max(0px, env(safe-area-inset-right, 0px));
@@ -519,12 +522,7 @@
   isolation: isolate;
   overflow: hidden;
   padding-top: 4.75rem;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    var(--archive-black);
-  background-size:
-    5rem 5rem,
-    auto;
+  background: var(--archive-black);
 }
 
 .about-opening__scanlines {
@@ -660,12 +658,29 @@
   min-height: 0;
 }
 
+.about-opening__portrait-frame::before {
+  position: absolute;
+  inset: 12% 9% 8%;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0.9;
+  background: radial-gradient(
+    circle at 52% 43%,
+    rgba(33, 174, 222, 0.22) 0,
+    rgba(21, 152, 194, 0.11) 36%,
+    transparent 70%
+  );
+  filter: blur(clamp(1.5rem, 3vw, 3.5rem));
+}
+
 /* Слой выведен из потока, поэтому картинка не может распереть строку сетки
    собственной пропорцией — высоту задаёт герой, а contain вписывает портрет
    в неё целиком. Вертикальные отступы — воздух над головой и под шеей. */
 .about-opening__portrait-drift {
   position: absolute;
   inset: clamp(0.75rem, 4%, 3rem) 0;
+  z-index: 1;
 }
 
 .about-opening__portrait-shift {
@@ -682,6 +697,10 @@
   /* Очки в исходнике на 54.7% × 43.2% кадра — сдвиг подводит их к
      оптическому центру героя, не срезая ни макушку, ни бока. */
   object-position: 52% center;
+  filter:
+    drop-shadow(0 0 1.25rem rgba(33, 174, 222, 0.28))
+    drop-shadow(0 0 3rem rgba(21, 152, 194, 0.14))
+    drop-shadow(0 0.75rem 1.5rem rgba(0, 0, 0, 0.4));
   animation: achimari-portrait-float 9s ease-in-out infinite;
 }
 
@@ -696,7 +715,7 @@
 }
 
 .dashboard-shell {
-  width: min(calc(100% - 2rem), 94rem);
+  width: min(calc(100% - var(--page-gutter) - var(--page-gutter)), 94rem);
   margin-inline: auto;
 }
 
@@ -1411,12 +1430,13 @@
     min-height: 19rem;
   }
 
-  /* Ник переезжает на вторую строку вместе с описанием, а не пропадает. */
+  /* В компактной раскладке ник не образует отдельную колонку: название
+     площадки уже даёт достаточно контекста, а контент получает больше места. */
   .channel-row a {
-    grid-template-columns: 3.5rem minmax(0, 1fr) auto 3.5rem;
+    grid-template-columns: 3.5rem minmax(0, 1fr) 3.5rem;
     grid-template-areas:
-      "index name        name   arrow"
-      "index description handle arrow";
+      "index name        arrow"
+      "index description arrow";
     align-items: center;
     min-height: 5rem;
   }
@@ -1449,11 +1469,8 @@
     padding-bottom: 0.6rem;
   }
 
-  .channel-row__handle {
-    grid-area: handle;
-    justify-content: flex-end;
-    padding-bottom: 0.6rem;
-    text-align: right;
+  .channel-row a > .channel-row__handle {
+    display: none;
   }
 
   .channel-row__arrow {
@@ -1468,8 +1485,11 @@
 }
 
 @media (max-width: 760px) {
+  :root {
+    --page-gutter: clamp(1rem, 5vw, 1.5rem);
+  }
+
   .archive-nav__inner {
-    width: min(calc(100% - 1.5rem), 94rem);
     height: 4rem;
   }
 
@@ -1554,10 +1574,6 @@
 
   .about-opening__portrait-image {
     object-position: center;
-  }
-
-  .dashboard-shell {
-    width: calc(100% - 1.5rem);
   }
 
   .dashboard-section {
@@ -1670,19 +1686,46 @@
     border-left: 0;
   }
 
-  /* Единая высота строки: описание может переноситься, ритм списка — нет. */
+  /* На мобильном ник дублирует название площадки и перегружает узкую строку.
+     Остаются три ясные зоны: номер, содержимое и стрелка. */
   .channel-row a {
-    grid-template-columns: 3rem minmax(0, 1fr) auto 3rem;
-    min-height: 5.75rem;
+    grid-template-columns: 3.5rem minmax(0, 1fr) 3.25rem;
+    grid-template-areas:
+      "index name        arrow"
+      "index description arrow";
+    min-height: 7rem;
+  }
+
+  .channel-row a > * {
+    padding-inline: 1rem;
+    padding-block: 0;
+  }
+
+  .channel-row__index {
+    justify-content: center;
+    padding-inline: 0.75rem;
   }
 
   .channel-row__name {
     font-size: clamp(1.85rem, 9vw, 2.6rem);
+    padding-top: 1rem;
+    padding-bottom: 0.3rem;
   }
 
-  .channel-row__description,
-  .channel-row__handle {
+  .channel-row__description {
+    padding-top: 0.15rem;
+    padding-bottom: 1rem;
     font-size: var(--type-label);
+    line-height: 1.45;
+  }
+
+  .channel-row a > .channel-row__handle {
+    display: none;
+  }
+
+  .channel-row__arrow {
+    justify-content: center;
+    padding-inline: 0.75rem;
   }
 
   .community-cta__panel {
@@ -1723,14 +1766,15 @@
     font-size: 0.62rem;
   }
 
-  /* На самых узких экранах описание и ник делят строку — уменьшаем перенос. */
+  /* На очень узких экранах сохраняем воздух внутри рамки, слегка уменьшая
+     только горизонтальную часть внутреннего отступа. */
   .channel-row a > * {
-    padding-inline: 0.7rem;
+    padding-inline: 0.85rem;
   }
 
-  .channel-row__description,
-  .channel-row__handle {
-    font-size: var(--type-label);
+  .channel-row__index,
+  .channel-row__arrow {
+    padding-inline: 0.65rem;
   }
 }
 
