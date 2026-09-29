@@ -3,54 +3,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="theme-color" content="#080808" />
 
-    <title>ACHIMARI</title>
+    <title>Achimari — стримы, музыка и разговоры</title>
     <meta
       name="description"
-      content="ACHIMARI"
+      content="Я Achimari. Стримлю на Twitch, обычно по вечерам: играю, болтаю с чатом, иногда беру гитару или читаю стихи. Анонсы эфиров заранее пишу в Telegram."
     />
+    <meta name="robots" content="index, follow" />
+    <!-- %SITE_URL% подставляет vite.config.ts из переменной SITE_URL (см. .env.example). -->
+    <link rel="canonical" href="%SITE_URL%/" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
-    <meta property="og:site_name" content="ACHIMARI" />
-    <meta property="og:title" content="ACHIMARI" />
+    <meta property="og:site_name" content="Achimari" />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:title" content="Achimari — стримы, музыка и разговоры" />
     <meta
       property="og:description"
-      content="ACHIMARI"
+      content="Стримлю на Twitch по вечерам: игры, чат, иногда гитара и стихи. Анонсы — в Telegram."
     />
-    <meta property="og:image" content="/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image" content="%SITE_URL%/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Сине-жёлтый портрет ACHIMARI в круглых очках" />
+    <meta property="og:image:alt" content="Сине-жёлтый портрет Achimari в круглых очках" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ACHIMARI" />
+    <meta name="twitter:title" content="Achimari — стримы, музыка и разговоры" />
     <meta
       name="twitter:description"
-      content="ACHIMARI"
+      content="Стримлю на Twitch по вечерам: игры, чат, иногда гитара и стихи. Анонсы — в Telegram."
     />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image" content="%SITE_URL%/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Сине-жёлтый портрет Achimari в круглых очках" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Только дисплейный шрифт заголовка героя: он определяет первый экран. -->
     <link
       rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap&subset=cyrillic"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Alumni+Sans:wght@700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap&subset=cyrillic"
+      as="font"
+      type="font/woff2"
+      href="/fonts/alumni-sans-cyrillic.woff2"
+      crossorigin
     />
 
     <style>
       html {
-        background: #0a0a0a;
+        background: #080808;
         color-scheme: dark;
       }
       #boot {
@@ -61,7 +63,7 @@
         align-items: center;
         justify-content: center;
         gap: 14px;
-        background: #0a0a0a;
+        background: #080808;
         color: #e7e1d5;
         font-family: system-ui, -apple-system, sans-serif;
         text-align: center;
@@ -84,8 +86,7 @@
   <body>
     <div id="root">
       <div id="boot">
-        <b>ACHIMARI</b>
-        <span>Загружаем стрим…</span>
+        <b>Achimari</b>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
