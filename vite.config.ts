@@ -2,19 +2,15 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
-  // Боевой адрес сайта для canonical, og:url и og:image — см. .env.example.
-  // Без него ссылки остаются относительными: canonical работает, а превью
-  // в Telegram и соцсетях может не подтянуть картинку.
-  const siteUrl = (loadEnv(mode, ".", "").SITE_URL ?? "").replace(/\/$/, "");
+  // Адрес сайта для canonical, og:url, og:image и JSON-LD. Переопределяется
+  // переменной SITE_URL (см. .env.example), по умолчанию — боевой домен.
+  const siteUrl = (loadEnv(mode, ".", "").SITE_URL || "https://achimari.top").replace(/\/$/, "");
 
   return {
     plugins: [
       react(),
       {
         name: "site-url",
-        buildStart() {
-          if (!siteUrl) this.warn("SITE_URL не задан — og:image и canonical будут относительными.");
-        },
         // "pre": до разбора ссылок Vite, иначе "%SITE_URL%" в href ломает decodeURI.
         transformIndexHtml: {
           order: "pre",

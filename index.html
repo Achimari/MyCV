@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#080808" />
 
-    <title>Achimari — стримы, музыка и разговоры</title>
+    <title>Achimari — стримы на Twitch, музыка и гитара</title>
     <meta
       name="description"
-      content="Я Achimari. Стримлю на Twitch, обычно по вечерам: играю, болтаю с чатом, иногда беру гитару или читаю стихи. Анонсы эфиров заранее пишу в Telegram."
+      content="Официальный сайт Achimari. Стримлю на Twitch по вечерам: играю, общаюсь с чатом, иногда беру гитару. Расписание стримов и анонсы — в Telegram."
     />
     <meta name="robots" content="index, follow" />
-    <!-- %SITE_URL% подставляет vite.config.ts из переменной SITE_URL (см. .env.example). -->
     <link rel="canonical" href="%SITE_URL%/" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Achimari",
+        "url": "%SITE_URL%/",
+        "inLanguage": "ru"
+      }
+    </script>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -21,7 +30,7 @@
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:site_name" content="Achimari" />
     <meta property="og:url" content="%SITE_URL%/" />
-    <meta property="og:title" content="Achimari — стримы, музыка и разговоры" />
+    <meta property="og:title" content="Achimari — стримы на Twitch, музыка и гитара" />
     <meta
       property="og:description"
       content="Стримлю на Twitch по вечерам: игры, чат, иногда гитара и стихи. Анонсы — в Telegram."
@@ -33,7 +42,7 @@
     <meta property="og:image:alt" content="Сине-жёлтый портрет Achimari в круглых очках" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Achimari — стримы, музыка и разговоры" />
+    <meta name="twitter:title" content="Achimari — стримы на Twitch, музыка и гитара" />
     <meta
       name="twitter:description"
       content="Стримлю на Twitch по вечерам: игры, чат, иногда гитара и стихи. Анонсы — в Telegram."
@@ -69,24 +78,54 @@
         text-align: center;
         padding: 24px;
       }
-      #boot b {
+      #boot h1 {
+        margin: 0;
         font-size: clamp(2.5rem, 12vw, 5rem);
         letter-spacing: -0.03em;
         font-weight: 800;
         line-height: 1;
       }
-      #boot span {
-        font-size: 0.75rem;
-        letter-spacing: 0.28em;
-        text-transform: uppercase;
+      #boot p,
+      #boot ul {
+        margin: 0;
+        padding: 0;
+        max-width: 34rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
         color: #a7a7a7;
+      }
+      #boot ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px 16px;
+        list-style: none;
+      }
+      #boot a {
+        color: #e7e1d5;
       }
     </style>
   </head>
   <body>
     <div id="root">
+      <!-- Видно до запуска React и поисковикам без JS; main.tsx заменяет это сценой. -->
       <div id="boot">
-        <b>Achimari</b>
+        <h1>Achimari</h1>
+        <p>
+          Привет, я Achimari, это мой официальный сайт. Стримлю на Twitch: играю, общаюсь с чатом,
+          иногда беру гитару — сыграть или спеть.
+        </p>
+        <p>
+          Расписание стримов: понедельник, среда, пятница и выходные, вечером. Точное время пишу в
+          Telegram.
+        </p>
+        <ul>
+          <li><a href="https://www.twitch.tv/achimari">Twitch</a></li>
+          <li><a href="https://t.me/achimari31">Telegram</a></li>
+          <li><a href="https://www.youtube.com/@akadiykleshnerukov">YouTube</a></li>
+          <li><a href="https://www.tiktok.com/@akadiy.kleshneruk">TikTok</a></li>
+          <li><a href="https://www.tiktok.com/@achimari31">TikTok 02</a></li>
+        </ul>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
