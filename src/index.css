@@ -767,10 +767,14 @@ a[data-on] .arrow {
   position: absolute;
   max-width: 21vw;
 }
-/* Несимметричный ритм: слева два крупных имени, справа три разного веса. */
+/* Три имени слева и три справа; центр остаётся для видео. */
 .star--twitch {
   left: 0;
   top: 5%;
+}
+.star--instagram {
+  left: 0;
+  top: 34%;
 }
 .star--youtube {
   left: 0;
@@ -840,6 +844,9 @@ a[data-on] .arrow {
 }
 .star--twitch .star__name {
   font-size: clamp(2.8rem, 10vh, 7rem);
+}
+.star--instagram .star__name {
+  font-size: clamp(2rem, 5.5vh, 4rem);
 }
 .star--youtube .star__name {
   font-size: clamp(2.2rem, 7vh, 4.8rem);
@@ -1184,6 +1191,7 @@ a[data-on] .arrow {
     transform: none;
   }
   .star__name,
+  .star--instagram .star__name,
   .star--youtube .star__name,
   .star--tiktok .star__name {
     font-size: clamp(1.6rem, 7vw, 2rem);

@@ -1,5 +1,6 @@
 export const socials = {
   twitch: "https://www.twitch.tv/achimari",
+  instagram: "https://www.instagram.com/achimari31/",
   tiktok: "https://www.tiktok.com/@akadiy.kleshneruk",
   tiktok2: "https://www.tiktok.com/@achimari31",
   youtube: "https://www.youtube.com/@akadiykleshnerukov",
@@ -83,6 +84,7 @@ export interface SocialEntry {
 
 export const socialLinks: SocialEntry[] = [
   { key: "twitch", name: "Twitch", handle: "@achimari", description: "Стримы и чат", url: socials.twitch },
+  { key: "instagram", name: "Instagram", handle: "@achimari31", description: "Фото и видео", url: socials.instagram },
   {
     key: "tiktok",
     name: "TikTok",
